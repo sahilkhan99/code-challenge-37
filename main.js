@@ -19,10 +19,11 @@ var api = {};
 
 */
 api.fanOut = (input, fn) => {
-  /**
-   * Your implementation goes here
-   */
-  return input.map(x => fn(x));
+  let result = [];
+  for (let val of input) {
+    result.push(fn(val))
+  }
+  return result;
 };
 
 /**
@@ -47,15 +48,11 @@ api.fanOut = (input, fn) => {
 
  */
 api.funnel = (input, fn, startValue) => {
-  /**
-   * Your implementation goes here
-   * can do one liner as well 
-   * return input.reduce(fn, startValue);
-   */
-  return input.reduce((acc, value)=> {
-    return fn(acc, value);
-  }, startValue);
-
+  let accumulator = startValue;
+  for (let val of input) {
+    accumulator = fn(accumulator, val);
+  }
+  return accumulator;
 };
 
 /**
@@ -78,10 +75,13 @@ api.funnel = (input, fn, startValue) => {
 
  */
 api.distill = (input, fn) => {
-  /**
-   * Your implementation goes here
-   */
-  return input.filter(f => fn(f));
+  let result = [];
+  for (let val of input) {
+    if (fn(val)) {
+      result.push(val)
+    }
+  }
+  return result;
 };
 
 /**
@@ -100,10 +100,8 @@ api.distill = (input, fn) => {
 
  */
 api.numberOfChars = (input) => {
-  /**
-   * Your implementation goes here
-   */
-  return api.funnel(input, (w,s)=> w+s.length, 0);
+  const lengthOfWords = api.fanOut(input, eachItem => eachItem.length);
+  return api.funnel(lengthOfWords, (prev, next) => (prev + next), 0);
 };
 
 /**
@@ -124,19 +122,8 @@ api.numberOfChars = (input) => {
 
  */
 api.numberOfCertainChars = (input, c) => {
-  /**
-   * Your implementation goes here
-   */
-
-   /* Notes
-   *  Can use Regex to simplify the solution. 
-   *  But as suggested in the above restrictions using distill for now.
-   *   solution
-   *   var regex = new RegExp(c, 'g');
-   *   return (input.join('').match(regex)||[]).length
-   */
-  const arrayOfCertainChars = api.distill(input.join('').split(''), f => f===c);
-  return arrayOfCertainChars.length;
+  const filteredWordsLength = api.fanOut(input, item => api.distill(item, (ch) => ch === c).length);
+  return api.funnel(filteredWordsLength, (prev, next) => (prev + next), 0);
 };
 
 module.exports = api;

@@ -22,7 +22,7 @@ api.fanOut = (input, fn) => {
   /**
    * Your implementation goes here
    */
-  return [];
+  return input.map(x => fn(x));
 };
 
 /**
@@ -49,8 +49,13 @@ api.fanOut = (input, fn) => {
 api.funnel = (input, fn, startValue) => {
   /**
    * Your implementation goes here
+   * can do one liner as well 
+   * return input.reduce(fn, startValue);
    */
-  return 0;
+  return input.reduce((acc, value)=> {
+    return fn(acc, value);
+  }, startValue);
+
 };
 
 /**
@@ -76,7 +81,7 @@ api.distill = (input, fn) => {
   /**
    * Your implementation goes here
    */
-  return [];
+  return input.filter(f => fn(f));
 };
 
 /**
@@ -98,7 +103,7 @@ api.numberOfChars = (input) => {
   /**
    * Your implementation goes here
    */
-  return 0;
+  return api.funnel(input, (w,s)=> w+s.length, 0);
 };
 
 /**
@@ -122,7 +127,16 @@ api.numberOfCertainChars = (input, c) => {
   /**
    * Your implementation goes here
    */
-  return 0;
+
+   /* Notes
+   *  Can use Regex to simplify the solution. 
+   *  But as suggested in the above restrictions using distill for now.
+   *   solution
+   *   var regex = new RegExp(c, 'g');
+   *   return (input.join('').match(regex)||[]).length
+   */
+  const arrayOfCertainChars = api.distill(input.join('').split(''), f => f===c);
+  return arrayOfCertainChars.length;
 };
 
 module.exports = api;
